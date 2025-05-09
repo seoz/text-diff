@@ -169,7 +169,7 @@ function App() {
         {notification && (
           <div className="notification">{notification}</div>
         )}
-        <h1>Text Diff Tool (3-way)</h1>
+        <h1>SeoZ Text Diff</h1>
         <div className="controls">
           <div className="controls-row">
             <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>

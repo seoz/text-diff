@@ -11,7 +11,7 @@ Currently, two official plugins are available:
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
 
-# Text Diff Tool (3-way)
+# SeoZ Text Diff
 
 A simple web app to compare three texts, visualize differences (line and word level), ignore whitespace, toggle dark mode, and save/load multiple diff results.
 
