@@ -85,6 +85,8 @@ function App() {
     setIgnoreWhitespace(save.ignoreWhitespace);
     setSelectedSave(save.id);
     setTitle(save.title || getDefaultTitle(save.texts));
+    setNotification(`Loaded diff: "${save.title || getDefaultTitle(save.texts)}"`);
+    setTimeout(() => setNotification(null), 2500);
   };
 
   const handleDelete = (id) => {
@@ -92,6 +94,8 @@ function App() {
     setSavedDiffs(updated);
     localStorage.setItem(LOCAL_KEY, JSON.stringify(updated));
     if (selectedSave === id) setSelectedSave(null);
+    setNotification('Saved diff deleted');
+    setTimeout(() => setNotification(null), 2500);
   };
 
   const handleReset = () => {
@@ -103,6 +107,8 @@ function App() {
     setSavedDiffs([]);
     localStorage.setItem(LOCAL_KEY, JSON.stringify([]));
     setSelectedSave(null);
+    setNotification('All saved diffs removed');
+    setTimeout(() => setNotification(null), 2500);
   };
 
   const handleExport = () => {
@@ -116,6 +122,8 @@ function App() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    setNotification('Saved diffs exported');
+    setTimeout(() => setNotification(null), 2500);
   };
 
   const handleImportClick = () => {
@@ -135,6 +143,8 @@ function App() {
           const merged = [...imported.filter(d => !existingIds.has(d.id)), ...savedDiffs];
           setSavedDiffs(merged);
           localStorage.setItem(LOCAL_KEY, JSON.stringify(merged));
+          setNotification('Saved diffs imported');
+          setTimeout(() => setNotification(null), 2500);
         }
       } catch (err) {
         alert('Invalid file format.');
@@ -204,6 +214,12 @@ function App() {
   });
   const summaries = lineDiffs.map(summarizeDiff);
 
+  const handleToggle = (setter, value, message) => {
+    setter(value);
+    setNotification(message);
+    setTimeout(() => setNotification(null), 1800);
+  };
+
   return (
     <div className="page-background">
       <div className={`app-container${darkMode ? ' dark' : ''}`}>  
@@ -216,35 +232,35 @@ function App() {
             <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <span>Ignore Whitespace</span>
               <span className="toggle-switch">
-                <input type="checkbox" checked={ignoreWhitespace} onChange={e => setIgnoreWhitespace(e.target.checked)} />
+                <input type="checkbox" checked={ignoreWhitespace} onChange={e => handleToggle(setIgnoreWhitespace, e.target.checked, e.target.checked ? 'Ignore Whitespace ON' : 'Ignore Whitespace OFF')} />
                 <span className="toggle-slider"></span>
               </span>
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <span>Case Sensitive</span>
               <span className="toggle-switch">
-                <input type="checkbox" checked={caseSensitive} onChange={e => setCaseSensitive(e.target.checked)} />
+                <input type="checkbox" checked={caseSensitive} onChange={e => handleToggle(setCaseSensitive, e.target.checked, e.target.checked ? 'Case Sensitive ON' : 'Case Sensitive OFF')} />
                 <span className="toggle-slider"></span>
               </span>
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <span>Side-by-side View</span>
               <span className="toggle-switch">
-                <input type="checkbox" checked={sideBySide} onChange={e => setSideBySide(e.target.checked)} />
+                <input type="checkbox" checked={sideBySide} onChange={e => handleToggle(setSideBySide, e.target.checked, e.target.checked ? 'Side-by-side View ON' : 'Side-by-side View OFF')} />
                 <span className="toggle-slider"></span>
               </span>
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <span>Light Mode</span>
               <span className="toggle-switch">
-                <input type="checkbox" checked={!darkMode} onChange={e => setDarkMode(d => !d)} />
+                <input type="checkbox" checked={!darkMode} onChange={e => handleToggle(setDarkMode, !e.target.checked, !e.target.checked ? 'Dark Mode ON' : 'Light Mode ON')} />
                 <span className="toggle-slider"></span>
               </span>
             </label>
           </div>
           <div className="controls-row">
-            <button onClick={handleSave}>Save Diff</button>
-            <button onClick={handleReset} style={{marginLeft: '0.7em'}}>Reset</button>
+            <button onClick={() => { handleSave(); }} >Save Diff</button>
+            <button onClick={() => { handleReset(); setNotification('Inputs reset'); setTimeout(() => setNotification(null), 1800); }} style={{marginLeft: '0.7em'}}>Reset</button>
           </div>
         </div>
         <div className="save-title-row">
@@ -284,6 +300,9 @@ function App() {
                 placeholder={inputTitles[i] || `Text ${i + 1}`}
                 rows={8}
               />
+              <div style={{ fontSize: '0.95em', color: '#888', marginTop: '0.2em', alignSelf: 'flex-end', width: '80%', textAlign: 'right' }}>
+                {texts[i].trim() ? `${texts[i].trim().split(/\s+/).length} words` : '0 words'}
+              </div>
             </div>
           ))}
         </div>
