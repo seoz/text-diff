@@ -23,6 +23,7 @@ A simple web app to compare three texts, visualize differences (line and word le
 
    ```bash
    npm install
+   npm install diff
    ```
 
 3. **Start the development server:**
