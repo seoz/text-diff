@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { diffLines, diffWords } from 'diff';
 import './App.css';
 
@@ -30,17 +30,18 @@ function getDefaultTitle(texts) {
 const LOCAL_KEY = 'text-diff-saves';
 
 function App() {
-  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  // const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   const [texts, setTexts] = useState(['', '', '']);
   const [ignoreWhitespace, setIgnoreWhitespace] = useState(false);
   const [caseSensitive, setCaseSensitive] = useState(true);
-  const [darkMode, setDarkMode] = useState(() => prefersDark || true);
+  const [darkMode, setDarkMode] = useState(false);
   const [savedDiffs, setSavedDiffs] = useState([]);
   const [selectedSave, setSelectedSave] = useState(null);
   const [sideBySide, setSideBySide] = useState(false);
   const [title, setTitle] = useState('');
   const [notification, setNotification] = useState(null);
   const [inputTitles, setInputTitles] = useState(['Initial Draft', 'Text 2', 'Text 3']);
+  const fileInputRef = useRef();
 
   useEffect(() => {
     document.body.className = darkMode ? 'dark' : '';
@@ -102,6 +103,46 @@ function App() {
     setSavedDiffs([]);
     localStorage.setItem(LOCAL_KEY, JSON.stringify([]));
     setSelectedSave(null);
+  };
+
+  const handleExport = () => {
+    const dataStr = JSON.stringify(savedDiffs, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'seoz-text-diff-saves.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleImport = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const imported = JSON.parse(event.target.result);
+        if (Array.isArray(imported)) {
+          // Merge, avoiding duplicates by id
+          const existingIds = new Set(savedDiffs.map(d => d.id));
+          const merged = [...imported.filter(d => !existingIds.has(d.id)), ...savedDiffs];
+          setSavedDiffs(merged);
+          localStorage.setItem(LOCAL_KEY, JSON.stringify(merged));
+        }
+      } catch (err) {
+        alert('Invalid file format.');
+      }
+    };
+    reader.readAsText(file);
+    // Reset input so the same file can be imported again if needed
+    e.target.value = '';
   };
 
   // Helper to apply case sensitivity
@@ -262,6 +303,9 @@ function App() {
         <div className="saves">
           <h2>Saved Diffs</h2>
           <button onClick={handleDeleteAll} style={{marginBottom: '0.7em', fontSize: '0.95em'}}>Remove All</button>
+          <button onClick={handleExport} style={{marginBottom: '0.7em', fontSize: '0.95em', marginLeft: '0.7em'}}>Export</button>
+          <button onClick={handleImportClick} style={{marginBottom: '0.7em', fontSize: '0.95em', marginLeft: '0.7em'}}>Import</button>
+          <input type="file" accept="application/json" ref={fileInputRef} onChange={handleImport} style={{ display: 'none' }} />
           {savedDiffs.length === 0 && <p>No saved diffs.</p>}
           <ul>
             {savedDiffs.slice(0, 5).map(save => (
