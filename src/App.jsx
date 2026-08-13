@@ -307,17 +307,20 @@ function App() {
           ))}
         </div>
         <div className="diffs">
-          {pairs.map(([a, b], idx) => (
-            <div key={idx} className="diff-section">
-              <h2>Diff: Text {a + 1} vs Text {b + 1}</h2>
-              <DiffSummary summary={summaries[idx]} />
-              {sideBySide ? (
-                <SideBySideView a={texts[a]} b={texts[b]} wordDiff={wordDiffs[idx]} />
-              ) : (
-                <DiffView lineDiff={lineDiffs[idx]} wordDiff={wordDiffs[idx]} />
-              )}
-            </div>
-          ))}
+          {pairs.map(([a, b], idx) => {
+            if ((a === 2 || b === 2) && !texts[2].trim()) return null;
+            return (
+              <div key={idx} className="diff-section">
+                <h2>Diff: Text {a + 1} vs Text {b + 1}</h2>
+                <DiffSummary summary={summaries[idx]} />
+                {sideBySide ? (
+                  <SideBySideView a={texts[a]} b={texts[b]} wordDiff={wordDiffs[idx]} />
+                ) : (
+                  <DiffView lineDiff={lineDiffs[idx]} wordDiff={wordDiffs[idx]} />
+                )}
+              </div>
+            );
+          })}
         </div>
         <div className="saves">
           <h2>Saved Diffs</h2>
