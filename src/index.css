@@ -1,73 +1,129 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color-scheme: light dark;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Design tokens — light theme (default) */
+  --font-mono: 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --bg-page-start: #eef1f8;
+  --bg-page-end: #dfe4f3;
+  --bg-surface: #ffffff;
+  --bg-surface-alt: #f6f8fc;
+  --bg-surface-raised: #ffffff;
+
+  --border-color: #e3e7f0;
+  --border-color-strong: #ccd2e2;
+
+  --text-primary: #1c2032;
+  --text-secondary: #4c5266;
+  --text-muted: #8a91a6;
+
+  --accent: #5457e5;
+  --accent-hover: #4548c9;
+  --accent-soft: #edeeff;
+  --accent-contrast: #ffffff;
+
+  --success: #16803c;
+  --success-bg: #e3f7e8;
+  --danger: #c0392b;
+  --danger-bg: #fdeceb;
+  --danger-hover: #a8321f;
+
+  --shadow-sm: 0 1px 3px rgba(30, 34, 60, 0.07);
+  --shadow-md: 0 8px 24px rgba(30, 34, 60, 0.08);
+  --shadow-lg: 0 20px 48px rgba(30, 34, 60, 0.12);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 18px;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+body.dark {
+  --bg-page-start: #12131c;
+  --bg-page-end: #1a1c2b;
+  --bg-surface: #1c1e2b;
+  --bg-surface-alt: #242637;
+  --bg-surface-raised: #262939;
+
+  --border-color: #333650;
+  --border-color-strong: #414568;
+
+  --text-primary: #eef0f8;
+  --text-secondary: #b6bbd4;
+  --text-muted: #7d82a0;
+
+  --accent: #8386ff;
+  --accent-hover: #9799ff;
+  --accent-soft: #292c4c;
+  --accent-contrast: #14151f;
+
+  --success: #6fd08c;
+  --success-bg: #17301f;
+  --danger: #ff8b80;
+  --danger-bg: #3a1f1f;
+  --danger-hover: #ff6f62;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.45);
 }
-a:hover {
-  color: #535bf2;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  color: var(--text-primary);
+  background: var(--bg-page-start);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-body.dark {
-  background: #181818;
-  color: #eee;
+a {
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--accent-hover);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+h1,
+h2,
+h3,
+h4 {
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+input,
+textarea {
+  font-family: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text-primary);
 }

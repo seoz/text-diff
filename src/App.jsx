@@ -222,86 +222,81 @@ function App() {
 
   return (
     <div className="page-background">
-      <div className={`app-container${darkMode ? ' dark' : ''}`}>  
+      <div className={`app-container${darkMode ? ' dark' : ''}`}>
         {notification && (
           <div className="notification">{notification}</div>
         )}
-        <h1>SeoZ Text Diff</h1>
+        <header className="app-header">
+          <h1>SeoZ Text Diff</h1>
+          <p className="app-subtitle">Compare up to three versions of a text, line by line and word by word.</p>
+        </header>
         <div className="controls">
-          <div className="controls-row">
-            <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span>Ignore Whitespace</span>
+          <div className="controls-row toggles-row">
+            <label className="toggle-label">
               <span className="toggle-switch">
                 <input type="checkbox" checked={ignoreWhitespace} onChange={e => handleToggle(setIgnoreWhitespace, e.target.checked, e.target.checked ? 'Ignore Whitespace ON' : 'Ignore Whitespace OFF')} />
                 <span className="toggle-slider"></span>
               </span>
+              <span>Ignore Whitespace</span>
             </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span>Case Sensitive</span>
+            <label className="toggle-label">
               <span className="toggle-switch">
                 <input type="checkbox" checked={caseSensitive} onChange={e => handleToggle(setCaseSensitive, e.target.checked, e.target.checked ? 'Case Sensitive ON' : 'Case Sensitive OFF')} />
                 <span className="toggle-slider"></span>
               </span>
+              <span>Case Sensitive</span>
             </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span>Side-by-side View</span>
+            <label className="toggle-label">
               <span className="toggle-switch">
                 <input type="checkbox" checked={sideBySide} onChange={e => handleToggle(setSideBySide, e.target.checked, e.target.checked ? 'Side-by-side View ON' : 'Side-by-side View OFF')} />
                 <span className="toggle-slider"></span>
               </span>
+              <span>Side-by-side View</span>
             </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span>Light Mode</span>
+            <label className="toggle-label">
               <span className="toggle-switch">
                 <input type="checkbox" checked={!darkMode} onChange={e => handleToggle(setDarkMode, !e.target.checked, !e.target.checked ? 'Dark Mode ON' : 'Light Mode ON')} />
                 <span className="toggle-slider"></span>
               </span>
+              <span>Light Mode</span>
             </label>
           </div>
-          <div className="controls-row">
-            <button onClick={() => { handleSave(); }} >Save Diff</button>
-            <button onClick={() => { handleReset(); setNotification('Inputs reset'); setTimeout(() => setNotification(null), 1800); }} style={{marginLeft: '0.7em'}}>Reset</button>
+          <div className="controls-row actions-row">
+            <button className="btn btn-primary" onClick={handleSave}>Save Diff</button>
+            <button className="btn btn-secondary" onClick={() => { handleReset(); setNotification('Inputs reset'); setTimeout(() => setNotification(null), 1800); }}>Reset</button>
           </div>
         </div>
         <div className="save-title-row">
-          <label style={{ fontWeight: 'bold', marginRight: 8 }}>
-            Diff Title:
+          <label className="save-title-field">
+            Diff Title
             <input
               type="text"
               value={title}
               onChange={e => setTitle(e.target.value)}
-              style={{ marginLeft: 8, width: 300 }}
               placeholder="Enter a title for this diff"
             />
           </label>
         </div>
         <div className="inputs">
           {[0, 1, 2].map(i => (
-            <div key={i} style={{display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1em'}}>
+            <div key={i} className="input-card">
               <input
                 type="text"
+                className="input-card-title"
                 value={inputTitles[i]}
                 onChange={e => handleInputTitleChange(i, e.target.value)}
-                style={{
-                  fontWeight: 'bold',
-                  fontSize: '1.08em',
-                  marginBottom: '0.4em',
-                  textAlign: 'center',
-                  width: '80%',
-                  borderRadius: '5px',
-                  border: '1px solid #ccc',
-                  padding: '0.3em 0.5em',
-                }}
-                placeholder={`Text ${i + 1} Title`}
+                placeholder={`Text ${i + 1} Title${i === 2 ? ' (optional)' : ''}`}
               />
               <textarea
                 value={texts[i]}
                 onChange={e => handleTextChange(i, e.target.value)}
-                placeholder={inputTitles[i] || `Text ${i + 1}`}
+                placeholder={i === 2 ? `${inputTitles[i] || 'Text 3'} — optional` : (inputTitles[i] || `Text ${i + 1}`)}
                 rows={8}
               />
-              <div style={{ fontSize: '0.95em', color: '#888', marginTop: '0.2em', alignSelf: 'flex-end', width: '80%', textAlign: 'right' }}>
-                {texts[i].trim() ? `${texts[i].trim().split(/\s+/).length} words` : '0 words'}
+              <div className="input-card-meta">
+                <span className="word-count">
+                  {texts[i].trim() ? `${texts[i].trim().split(/\s+/).length} words` : '0 words'}
+                </span>
               </div>
             </div>
           ))}
@@ -309,12 +304,16 @@ function App() {
         <div className="diffs">
           {pairs.map(([a, b], idx) => {
             if ((a === 2 || b === 2) && !texts[2].trim()) return null;
+            const titleA = inputTitles[a] || `Text ${a + 1}`;
+            const titleB = inputTitles[b] || `Text ${b + 1}`;
             return (
               <div key={idx} className="diff-section">
-                <h2>Diff: Text {a + 1} vs Text {b + 1}</h2>
-                <DiffSummary summary={summaries[idx]} />
+                <div className="diff-section-header">
+                  <h2>{titleA} vs {titleB}</h2>
+                  <DiffSummary summary={summaries[idx]} />
+                </div>
                 {sideBySide ? (
-                  <SideBySideView a={texts[a]} b={texts[b]} wordDiff={wordDiffs[idx]} />
+                  <SideBySideView a={texts[a]} b={texts[b]} titleA={titleA} titleB={titleB} wordDiff={wordDiffs[idx]} />
                 ) : (
                   <DiffView lineDiff={lineDiffs[idx]} wordDiff={wordDiffs[idx]} />
                 )}
@@ -324,29 +323,30 @@ function App() {
         </div>
         <div className="saves">
           <h2>Saved Diffs</h2>
-          <button onClick={handleDeleteAll} style={{marginBottom: '0.7em', fontSize: '0.95em'}}>Remove All</button>
-          <button onClick={handleExport} style={{marginBottom: '0.7em', fontSize: '0.95em', marginLeft: '0.7em'}}>Export</button>
-          <button onClick={handleImportClick} style={{marginBottom: '0.7em', fontSize: '0.95em', marginLeft: '0.7em'}}>Import</button>
-          <input type="file" accept="application/json" ref={fileInputRef} onChange={handleImport} style={{ display: 'none' }} />
-          {savedDiffs.length === 0 && <p>No saved diffs.</p>}
-          <ul>
-            {savedDiffs.slice(0, 5).map(save => (
-              <li key={save.id} className={selectedSave === save.id ? 'selected' : ''}>
-                <span className="save-title">{save.title || getDefaultTitle(save.texts)}</span>
-                <span style={{ color: '#888', marginLeft: 8 }}>{save.date}</span>
-                <button onClick={() => handleLoad(save)}>Load</button>
-                <button onClick={() => handleDelete(save.id)}>Delete</button>
-              </li>
-            ))}
-            {savedDiffs.length > 5 && savedDiffs.slice(5).map(save => (
-              <li key={save.id} className={selectedSave === save.id ? 'selected' : ''} style={{ opacity: 0.7 }}>
-                <span className="save-title">{save.title || getDefaultTitle(save.texts)}</span>
-                <span style={{ color: '#888', marginLeft: 8 }}>{save.date}</span>
-                <button onClick={() => handleLoad(save)}>Load</button>
-                <button onClick={() => handleDelete(save.id)}>Delete</button>
-              </li>
-            ))}
-          </ul>
+          <div className="saves-toolbar">
+            <button className="btn btn-ghost" onClick={handleDeleteAll}>Remove All</button>
+            <button className="btn btn-ghost" onClick={handleExport}>Export</button>
+            <button className="btn btn-ghost" onClick={handleImportClick}>Import</button>
+            <input type="file" accept="application/json" ref={fileInputRef} onChange={handleImport} style={{ display: 'none' }} />
+          </div>
+          {savedDiffs.length === 0 ? (
+            <p className="saves-empty">No saved diffs yet — save one above to see it here.</p>
+          ) : (
+            <ul>
+              {savedDiffs.map((save, i) => (
+                <li key={save.id} className={`${selectedSave === save.id ? 'selected' : ''}${i >= 5 ? ' older' : ''}`}>
+                  <div className="save-info">
+                    <span className="save-title">{save.title || getDefaultTitle(save.texts)}</span>
+                    <span className="save-date">{save.date}</span>
+                  </div>
+                  <div className="save-actions">
+                    <button className="btn btn-ghost btn-sm" onClick={() => handleLoad(save)}>Load</button>
+                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(save.id)}>Delete</button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>
@@ -387,14 +387,14 @@ function DiffView({ lineDiff, wordDiff }) {
   );
 }
 
-function SideBySideView({ a, b, wordDiff }) {
+function SideBySideView({ a, b, titleA, titleB, wordDiff }) {
   const aLines = a.split('\n');
   const bLines = b.split('\n');
   const maxLen = Math.max(aLines.length, bLines.length);
   return (
     <div className="side-by-side">
       <div className="side">
-        <h4>Text A</h4>
+        <h4>{titleA}</h4>
         <pre>
           {Array.from({ length: maxLen }).map((_, i) => {
             const parts = Array.isArray(wordDiff[i]) ? wordDiff[i] : [];
@@ -413,7 +413,7 @@ function SideBySideView({ a, b, wordDiff }) {
         </pre>
       </div>
       <div className="side">
-        <h4>Text B</h4>
+        <h4>{titleB}</h4>
         <pre>
           {Array.from({ length: maxLen }).map((_, i) => {
             const parts = Array.isArray(wordDiff[i]) ? wordDiff[i] : [];
